@@ -41,19 +41,24 @@ def add_plaster():
     # commit changes and close the database connection
     conn.commit()
 
+def get_dropdownmenu_options():
+    cursor = conn.cursor()
+    options = []
+    names = cursor.execute('SELECT name FROM plasters')
+    for name in names:
+        options.append(name[0])  # Extract the first element(plaster name) from the tuple returned from query
 
-plaster = Plaster('Multi-Finish', 25, 5)
-cement = Plaster('Hardwall', 25, 10)
-materials_list = [plaster, cement]
+    return options
 
 
 def calculate():
-    plaster_name = plaster_input.get()
+    plaster_name = selected_plaster.get()
+    plaster_thickness = thickness_input.get()
     plaster = get_material(plaster_name)
 
     if plaster:
         area = int(length_input.get()) * int(width_input.get())
-        total_needed = plaster.material_needed(area, 10)
+        total_needed = plaster.material_needed(area, int(plaster_thickness))
         material_output.config(text=total_needed)
     else:
         print('Plaster not found')
@@ -71,6 +76,16 @@ def get_material(material_name):
     else:
         print('Material not found')
 
+def validate_float_input(text):
+    # tries to convert text from entry box into a float. return false to if invalid
+    if text == "":
+        return True  # Allow empty input (deleting)
+    try:
+        float(text)
+        return True
+    except ValueError:
+        return False
+
 # create a table for objects if table does not already exist
 
 
@@ -81,7 +96,7 @@ conn.execute('''CREATE TABLE IF NOT EXISTS plasters (
                 )''')
 
 
-add_plaster()
+#add_plaster()
 ########################## GUI ####################################
 
 # set up window size
@@ -92,7 +107,7 @@ window.config(padx=20, pady=20)
 window.config(background='lightgrey')
 
 background_image = PhotoImage(
-    file="Plaster-Calculator\output-onlinepngtools.png")
+    file="output-onlinepngtools.png")
 
 # Create a label with the background image
 background_label = Label(window, image=background_image)
@@ -100,41 +115,55 @@ background_label.place(x=0, y=0, relwidth=1, relheight=1)
 
 # create labels labels using the grid() method
 
-paster_label = Label(text='Plaster Type', background='white',
-                     font=('ariel', 12, 'bold'))
+plaster_label = Label(text='Plaster Type', background='white',
+                     font=('ariel', 12))
 length_label = Label(text='length', background='white',
-                     font=('ariel', 12, 'bold'))
+                     font=('ariel', 12))
+thickness_label = Label(text='Thickness in mm', background='white',
+                     font=('ariel', 12))
 width_label = Label(text='Width', background='white',
-                    font=('ariel', 12, 'bold'))
+                    font=('ariel', 12))
 total_material = Label(text='Total material in KG',
-                       background='white', font=('ariel', 12, 'bold'))
-material_output = Label(background='white', font=('ariel', 12, 'bold'))
+                       background='white', font=('ariel', 12))
+material_output = Label(background='white', font=('ariel', 12))
 
-paster_label.grid(column=0, row=1)
+plaster_label.grid(column=0, row=1)
 length_label.grid(column=0, row=2)
 width_label.grid(column=0, row=3)
-total_material.grid(column=0, row=4, padx=10, pady=10)
-material_output.grid(column=1, row=4)
+thickness_label.grid(column=0, row=4)
+total_material.grid(column=0, row=5, padx=10, pady=10)
+material_output.grid(column=1, row=5)
 
 
 # text boxes
+# Create a validation function to check if the input is a float
+validate_func = window.register(validate_float_input)
 
-plaster_input = Entry(background='white', width=6)
-length_input = Entry(background='white', width=6)
-width_input = Entry(background='white', width=6)
-# total_input = Entry(background='white',width=6)
+
+selected_plaster = StringVar()
+selected_plaster.set("Select plaster")  # Set the default selected plaster
+
+plaster_input = OptionMenu(window, selected_plaster, *get_dropdownmenu_options())
+
+length_input = Entry(window, validate="key", validatecommand=(validate_func, '%P'),width = 6)
+
+width_input = Entry(window, validate="key", validatecommand=(validate_func, '%P'),width =6)
+thickness_input = Entry(window, validate="key", validatecommand=(validate_func, '%P'),width = 6)
+
 
 plaster_input.grid(column=1, row=1, padx=10, pady=10)
 length_input.grid(column=1, row=2, padx=10, pady=10)
 width_input.grid(column=1, row=3, padx=10, pady=10)
+thickness_input.grid(column=1, row=4, padx=10, pady=10)
 # total_input.grid(column=1, row=3)
 
 # button
 
 button = Button(text='CONVERT', command=calculate)
+print(selected_plaster)
 
 
-button.grid(column=1, row=5)
+button.grid(column=1, row=6)
 
 window.mainloop()
 
