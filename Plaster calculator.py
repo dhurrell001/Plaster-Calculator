@@ -6,12 +6,13 @@ conn = sqlite3.connect('plasters.db')
 
 class Plaster():
 
-    def __init__(self, name, bag_size, cover) -> None:
+    def __init__(self, name, bag_size, cover, description) -> None:
         # cover = kg per mm thickness per metre square
 
         self.name = name
         self.bag_size = bag_size
         self.cover = cover
+        self.description = description
 
     def material_needed(self, area, thickness):
         return (area * self.cover) * thickness
@@ -23,7 +24,8 @@ def add_plaster():
     size = int(input('Please enter weight of bags in KG : '))
     coverage = int(
         input('Please enter cover rate (kg per mm per square metre) : '))
-    plaster_object = Plaster(name, size, coverage)
+    decsription = input('Please enter a brief description of the product')
+    plaster_object = Plaster(name, size, coverage, decsription)
 
     # load exisitng object to database. Check to make sure object does not already exist as record.
     cursor = conn.cursor()
@@ -32,8 +34,8 @@ def add_plaster():
     cursor.execute('SELECT name FROM plasters WHERE name=?',
                    (plaster_object.name,))
     if cursor.fetchone() is None:
-        conn.execute('INSERT INTO plasters VALUES (?, ?, ?)',
-                     (plaster_object.name, plaster_object.bag_size, plaster_object.cover))
+        conn.execute('INSERT INTO plasters VALUES (?, ?, ?,?)',
+                     (plaster_object.name, plaster_object.bag_size, plaster_object.cover, plaster_object.description))
         print('New plaster added to database.')
     else:
         print('Plaster already exists in database.')
@@ -80,11 +82,11 @@ def calculate_bags_needed(plaster_object, total_needed_in_kg):
 def get_material(material_name):
 
     cursor = conn.execute(
-        'SELECT name, bag_size, cover FROM plasters WHERE name=?', (material_name,))
+        'SELECT name, bag_size, cover,description FROM plasters WHERE name=?', (material_name,))
     object = cursor.fetchone()
     if object:
-        name, bag_size, cover = object
-        plaster = Plaster(name, bag_size, cover)
+        name, bag_size, cover, description = object
+        plaster = Plaster(name, bag_size, cover, description)
         return plaster
     else:
         print('Material not found')
@@ -106,10 +108,11 @@ def validate_float_input(text):
 conn.execute('''CREATE TABLE IF NOT EXISTS plasters (
                 name TEXT,
                 bag_size INTEGER,
-                cover INTEGER
+                cover INTEGER,
+                description TEXT
                 )''')
 
-
+# add_plaster()
 ########################## GUI ####################################
 
 # set up window size
