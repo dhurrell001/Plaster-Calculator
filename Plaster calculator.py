@@ -84,12 +84,13 @@ plaster_description_label.grid(column=0, row=8)
 validate_func = window.register(validate_float_input)
 
 
-selected_plaster = StringVar()
+selected_plaster = StringVar()  # variable to hold option selected in dropdown menu
 selected_plaster.set("Select plaster")  # Set the default selected plaster
 
 plaster_input = OptionMenu(window, selected_plaster,
                            *get_dropdownmenu_options())
 
+# validate entry boxes. validation on 'key' stroke. send each keystroke to validate function
 length_input = Entry(window, validate="key",
                      validatecommand=(validate_func, '%P'), width=6, background='white smoke')
 width_input = Entry(window, validate="key",
@@ -97,6 +98,7 @@ width_input = Entry(window, validate="key",
 thickness_input = Entry(window, validate="key",
                         validatecommand=(validate_func, '%P'), width=6, background='white smoke')
 
+#  input layout using grid
 
 plaster_input.grid(column=1, row=1, padx=10, pady=10)
 length_input.grid(column=1, row=2, padx=10, pady=10)
