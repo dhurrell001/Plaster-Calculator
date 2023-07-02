@@ -38,21 +38,25 @@ def add_plaster():
     else:
         print('Plaster already exists in database.')
 
-    # commit changes and close the database connection
+    # commit changes
     conn.commit()
 
+
 def get_dropdownmenu_options():
+    # select all plaster names from database and store in a list for
+    # dropdown menu options
     cursor = conn.cursor()
     options = []
     names = cursor.execute('SELECT name FROM plasters')
     for name in names:
-        options.append(name[0])  # Extract the first element(plaster name) from the tuple returned from query
+        # Extract the first element(plaster name) from the tuple returned from query
+        options.append(name[0])
 
     return options
 
 
 def calculate():
-    plaster_name = selected_plaster.get()
+    plaster_name = selected_plaster.get()  # get data from input box
     plaster_thickness = thickness_input.get()
     plaster = get_material(plaster_name)
 
@@ -60,8 +64,17 @@ def calculate():
         area = int(length_input.get()) * int(width_input.get())
         total_needed = plaster.material_needed(area, int(plaster_thickness))
         material_output.config(text=total_needed)
+
+        bags_required = calculate_bags_needed(plaster, total_needed)
+        bags_needed_output.config(text=bags_required)
+
     else:
         print('Plaster not found')
+
+
+def calculate_bags_needed(plaster_object, total_needed_in_kg):
+
+    return total_needed_in_kg / plaster_object.bag_size
 
 
 def get_material(material_name):
@@ -75,6 +88,7 @@ def get_material(material_name):
         return plaster
     else:
         print('Material not found')
+
 
 def validate_float_input(text):
     # tries to convert text from entry box into a float. return false to if invalid
@@ -96,18 +110,18 @@ conn.execute('''CREATE TABLE IF NOT EXISTS plasters (
                 )''')
 
 
-#add_plaster()
 ########################## GUI ####################################
 
 # set up window size
 window = Tk()
 window.title('PLASTER CALCULATOR')
-window.minsize(width=400, height=400)
-window.config(padx=20, pady=20)
+window.minsize(width=300, height=300)
+window.maxsize(width=400, height=400)
+window.config(padx=10, pady=10)
 window.config(background='lightgrey')
 
 background_image = PhotoImage(
-    file="output-onlinepngtools.png")
+    file="Plaster-Calculator\\output-onlinepngtools.png")
 
 # Create a label with the background image
 background_label = Label(window, image=background_image)
@@ -115,24 +129,31 @@ background_label.place(x=0, y=0, relwidth=1, relheight=1)
 
 # create labels labels using the grid() method
 
-plaster_label = Label(text='Plaster Type', background='white',
+plaster_label = Label(text='Plaster Type', background='white smoke',
+                      font=('ariel', 12))
+length_label = Label(text='length', background='white smoke',
                      font=('ariel', 12))
-length_label = Label(text='length', background='white',
-                     font=('ariel', 12))
-thickness_label = Label(text='Thickness in mm', background='white',
-                     font=('ariel', 12))
-width_label = Label(text='Width', background='white',
+thickness_label = Label(text='Thickness in mm', background='white smoke',
+                        font=('ariel', 12))
+width_label = Label(text='Width', background='white smoke',
                     font=('ariel', 12))
 total_material = Label(text='Total material in KG',
-                       background='white', font=('ariel', 12))
-material_output = Label(background='white', font=('ariel', 12))
+                       background='white smoke', font=('ariel', 12))
+material_output = Label(background='white smoke', font=('ariel', 12))
 
-plaster_label.grid(column=0, row=1)
+bags_needed_label = Label(text='Bags required : ',
+                          background='white smoke', font=('ariel', 12))
+bags_needed_output = Label(text='',
+                           background='white smoke', font=('ariel', 12))
+
+plaster_label.grid(column=0, row=1, padx=10, pady=10)
 length_label.grid(column=0, row=2)
 width_label.grid(column=0, row=3)
 thickness_label.grid(column=0, row=4)
 total_material.grid(column=0, row=5, padx=10, pady=10)
 material_output.grid(column=1, row=5)
+bags_needed_label.grid(column=0, row=6)
+bags_needed_output.grid(column=1, row=6)
 
 
 # text boxes
@@ -143,19 +164,22 @@ validate_func = window.register(validate_float_input)
 selected_plaster = StringVar()
 selected_plaster.set("Select plaster")  # Set the default selected plaster
 
-plaster_input = OptionMenu(window, selected_plaster, *get_dropdownmenu_options())
+plaster_input = OptionMenu(window, selected_plaster,
+                           *get_dropdownmenu_options())
 
-length_input = Entry(window, validate="key", validatecommand=(validate_func, '%P'),width = 6)
-
-width_input = Entry(window, validate="key", validatecommand=(validate_func, '%P'),width =6)
-thickness_input = Entry(window, validate="key", validatecommand=(validate_func, '%P'),width = 6)
+length_input = Entry(window, validate="key",
+                     validatecommand=(validate_func, '%P'), width=6, background='white smoke')
+width_input = Entry(window, validate="key",
+                    validatecommand=(validate_func, '%P'), width=6, background='white smoke')
+thickness_input = Entry(window, validate="key",
+                        validatecommand=(validate_func, '%P'), width=6, background='white smoke')
 
 
 plaster_input.grid(column=1, row=1, padx=10, pady=10)
 length_input.grid(column=1, row=2, padx=10, pady=10)
 width_input.grid(column=1, row=3, padx=10, pady=10)
 thickness_input.grid(column=1, row=4, padx=10, pady=10)
-# total_input.grid(column=1, row=3)
+
 
 # button
 
@@ -163,7 +187,7 @@ button = Button(text='CONVERT', command=calculate)
 print(selected_plaster)
 
 
-button.grid(column=1, row=6)
+button.grid(column=1, row=7)
 
 window.mainloop()
 
