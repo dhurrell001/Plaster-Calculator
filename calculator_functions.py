@@ -6,13 +6,14 @@ conn = sqlite3.connect('plasters.db')
 
 class Plaster():
 
-    def __init__(self, name, bag_size, cover, description) -> None:
+    def __init__(self, name, bag_size, cover, description, usage) -> None:
         # cover = kg per mm thickness per metre square
 
         self.name = name
         self.bag_size = bag_size
         self.cover = cover
         self.description = description
+        self.usage = usage
 
     def material_needed(self, area, thickness):
         return (area * self.cover) * thickness
@@ -25,7 +26,8 @@ def add_plaster():
     coverage = int(
         input('Please enter cover rate (kg per mm per square metre) : '))
     decsription = input('Please enter a brief description of the product')
-    plaster_object = Plaster(name, size, coverage, decsription)
+    usage = input('Please enter if for INTernal or EXTernal :')
+    plaster_object = Plaster(name, size, coverage, decsription, usage)
 
     # load exisitng object to database. Check to make sure object does not already exist as record.
     cursor = conn.cursor()
@@ -34,8 +36,8 @@ def add_plaster():
     cursor.execute('SELECT name FROM plasters WHERE name=?',
                    (plaster_object.name,))
     if cursor.fetchone() is None:       # fetches first row in query results
-        conn.execute('INSERT INTO plasters VALUES (?, ?, ?,?)',
-                     (plaster_object.name, plaster_object.bag_size, plaster_object.cover, plaster_object.description))
+        conn.execute('INSERT INTO plasters VALUES (?, ?, ?,?,?)',
+                     (plaster_object.name, plaster_object.bag_size, plaster_object.cover, plaster_object.description, plaster_object.usage))
         print('New plaster added to database.')
     else:
         print('Plaster already exists in database.')

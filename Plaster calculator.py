@@ -24,7 +24,8 @@ conn.execute('''CREATE TABLE IF NOT EXISTS plasters (
                 name TEXT,
                 bag_size INTEGER,
                 cover INTEGER,
-                description TEXT
+                description TEXT,
+                usage TEXT
                 )''')
 
 # add_plaster()
@@ -89,6 +90,21 @@ selected_plaster.set("Select plaster")  # Set the default selected plaster
 
 plaster_input = OptionMenu(window, selected_plaster,
                            *get_dropdownmenu_options())
+
+# create radio button to toggle between internal and external plasters in drop dowm menu
+
+radio_choice = IntVar()
+radio_choice.set(1)
+
+plaster_choice_internal = Radiobutton(
+    window, text='Internal', variable=radio_choice, value=1)
+plaster_choice_external = Radiobutton(
+    window, text='External', variable=radio_choice, value=2)
+
+# place radio buttons
+
+plaster_choice_internal.grid(column=0, row=9)
+plaster_choice_external.grid(column=1, row=9)
 
 # validate entry boxes. validation on 'key' stroke. send each keystroke to validate function
 length_input = Entry(window, validate="key",
