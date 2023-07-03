@@ -4,7 +4,7 @@ import sqlite3
 
 conn = sqlite3.connect('plasters.db')
 
-
+print(conn)
 def gather_information():
 
     # gather the data to pass to Calculate function in calculator_function
@@ -28,7 +28,7 @@ conn.execute('''CREATE TABLE IF NOT EXISTS plasters (
                 usage TEXT
                 )''')
 
-# add_plaster()
+#add_plaster()
 ########################## GUI ####################################
 
 # set up window size
@@ -40,7 +40,7 @@ window.config(padx=10, pady=10)
 window.config(background='lightgrey')
 
 background_image = PhotoImage(
-    file="Plaster-Calculator\\output-onlinepngtools.png")
+    file="output-onlinepngtools.png")
 
 # Create a label with the background image
 background_label = Label(window, image=background_image)
@@ -105,7 +105,7 @@ selected_plaster = StringVar()  # variable to hold option selected in dropdown m
 selected_plaster.set("Select plaster")  # Set the default selected plaster
 
 plaster_input = OptionMenu(window, selected_plaster,
-                           *get_dropdownmenu_options(radio_choice))
+                           *get_dropdownmenu_options(radio_choice.get()))
 
 
 # validate entry boxes. validation on 'key' stroke. send each keystroke to validate function

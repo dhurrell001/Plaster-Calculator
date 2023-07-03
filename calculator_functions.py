@@ -45,6 +45,13 @@ def add_plaster():
     # commit changes to data base
     conn.commit()
 
+def update_dropdown_options(radio_choice,plaster_input,selected_plaster):
+    plaster_type = radio_choice
+    options = get_dropdownmenu_options(plaster_type)
+    plaster_input['menu'].delete(0, 'end')  # Clear the current options
+
+    for option in options:
+        plaster_input['menu'].add_command(label=option, command=lambda value=option: selected_plaster.set(value))
 
 def get_dropdownmenu_options(plaster_type):
 
@@ -53,14 +60,21 @@ def get_dropdownmenu_options(plaster_type):
 
     cursor = conn.cursor()
     options = []
-    print(plaster_type)
+    """
+    names = cursor.execute('SELECT name FROM plasters')
+    for name in names:
+        # Extract the first element(plaster name) from the tuple returned from query
+        options.append(name[0])
+    
+    """
+
     if plaster_type == 1:
         names = cursor.execute(
             'SELECT name FROM plasters WHERE usage = "INT"')
         for name in names:
             # Extract the first element(plaster name) from the tuple returned from query
             options.append(name[0])
-    else:
+    elif plaster_type == 2:
         names = cursor.execute(
             'SELECT name FROM plasters WHERE usage = "EXT"')
         for name in names:
@@ -97,7 +111,7 @@ def get_material(material_name):
     # get material record fron DB and return created Plaster object
 
     cursor = conn.execute(
-        'SELECT name, bag_size, cover,description FROM plasters WHERE name=?', (material_name,))
+        'SELECT name, bag_size, cover,description,usage FROM plasters WHERE name=?', (material_name,))
     object = cursor.fetchone()
     if object:
         name, bag_size, cover, description, usage = object
