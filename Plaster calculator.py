@@ -81,20 +81,11 @@ plaster_description_label.grid(column=0, row=8)
 
 
 # text boxes
-# Create a validation function to check if the input is a float
-validate_func = window.register(validate_float_input)
-
-
-selected_plaster = StringVar()  # variable to hold option selected in dropdown menu
-selected_plaster.set("Select plaster")  # Set the default selected plaster
-
-plaster_input = OptionMenu(window, selected_plaster,
-                           *get_dropdownmenu_options())
 
 # create radio button to toggle between internal and external plasters in drop dowm menu
 
 radio_choice = IntVar()
-radio_choice.set(1)
+radio_choice.set(2)
 
 plaster_choice_internal = Radiobutton(
     window, text='Internal', variable=radio_choice, value=1)
@@ -105,6 +96,17 @@ plaster_choice_external = Radiobutton(
 
 plaster_choice_internal.grid(column=0, row=9)
 plaster_choice_external.grid(column=1, row=9)
+
+# Create a validation function to check if the input is a float
+validate_func = window.register(validate_float_input)
+
+
+selected_plaster = StringVar()  # variable to hold option selected in dropdown menu
+selected_plaster.set("Select plaster")  # Set the default selected plaster
+
+plaster_input = OptionMenu(window, selected_plaster,
+                           *get_dropdownmenu_options(radio_choice))
+
 
 # validate entry boxes. validation on 'key' stroke. send each keystroke to validate function
 length_input = Entry(window, validate="key",
