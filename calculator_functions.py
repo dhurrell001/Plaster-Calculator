@@ -46,17 +46,35 @@ def add_plaster():
     conn.commit()
 
 
-def get_dropdownmenu_options():
+
+def get_dropdownmenu_options(plaster_type):
 
     # select all plaster names from database and store in a list for
     # dropdown menu options
+
     cursor = conn.cursor()
     options = []
+    """
     names = cursor.execute('SELECT name FROM plasters')
     for name in names:
         # Extract the first element(plaster name) from the tuple returned from query
         options.append(name[0])
+    
+    """
 
+    if plaster_type == 1:
+        names = cursor.execute(
+            'SELECT name FROM plasters WHERE usage = "INT"')
+        for name in names:
+            # Extract the first element(plaster name) from the tuple returned from query
+            options.append(name[0])
+    elif plaster_type == 2:
+        names = cursor.execute(
+            'SELECT name FROM plasters WHERE usage = "EXT"')
+        for name in names:
+            # Extract the first element(plaster name) from the tuple returned from query
+            options.append(name[0])
+    
     return options
 
 
@@ -87,11 +105,11 @@ def get_material(material_name):
     # get material record fron DB and return created Plaster object
 
     cursor = conn.execute(
-        'SELECT name, bag_size, cover,description FROM plasters WHERE name=?', (material_name,))
+        'SELECT name, bag_size, cover,description,usage FROM plasters WHERE name=?', (material_name,))
     object = cursor.fetchone()
     if object:
-        name, bag_size, cover, description = object
-        plaster = Plaster(name, bag_size, cover, description)
+        name, bag_size, cover, description, usage = object
+        plaster = Plaster(name, bag_size, cover, description, usage)
         return plaster
     else:
         print('Material not found')
