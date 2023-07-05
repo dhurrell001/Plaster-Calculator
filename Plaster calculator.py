@@ -1,10 +1,11 @@
 from tkinter import *
 from calculator_functions import *
 import sqlite3
+from tkinter import ttk
 
 conn = sqlite3.connect('plasters.db')
 
-print(conn)
+
 def gather_information():
 
     # gather the data to pass to Calculate function in calculator_function
@@ -16,6 +17,21 @@ def gather_information():
 
     calculate(plaster_name, plaster_thickness, length,
               width, material_output, bags_needed_output, plaster_description_label)
+    
+# Function to update the dropdown options based on the selected plaster type
+def update_dropdown_options(*args):
+    plaster_type = radio_choice.get()  # Get the selected plaster type (1 for internal, 2 for external)
+    options = get_dropdownmenu_options(plaster_type)  # Retrieve the dropdown options based on the plaster type
+    print(options)
+    #selected_plaster.set("Select plaster")  # Reset the selected plaster to the default value
+
+    plaster_input['values'] = options  # Update the dropdown options
+
+def on_selection(event):
+    selected_plaster.set(plaster_input.get())
+
+   
+
 
 
 # create a table for objects if table does not already exist
@@ -85,12 +101,12 @@ plaster_description_label.grid(column=0, row=8)
 # create radio button to toggle between internal and external plasters in drop dowm menu
 
 radio_choice = IntVar()
-radio_choice.set(2)
+radio_choice.set(1)
 
 plaster_choice_internal = Radiobutton(
-    window, text='Internal', variable=radio_choice, value=1)
+    window, text='Internal', variable=radio_choice, value=1,command = update_dropdown_options)
 plaster_choice_external = Radiobutton(
-    window, text='External', variable=radio_choice, value=2)
+    window, text='External', variable=radio_choice, value=2,command=update_dropdown_options)
 
 # place radio buttons
 
@@ -104,8 +120,14 @@ validate_func = window.register(validate_float_input)
 selected_plaster = StringVar()  # variable to hold option selected in dropdown menu
 selected_plaster.set("Select plaster")  # Set the default selected plaster
 
-plaster_input = OptionMenu(window, selected_plaster,
-                           *get_dropdownmenu_options(radio_choice.get()))
+# Add a trace to the selected_plaster variable to call the update_dropdown_options function when it changes
+selected_plaster.trace("w", update_dropdown_options)
+
+# Create the Combobox widget
+plaster_input = ttk.Combobox(window, textvariable=selected_plaster, state='readonly')
+# Bind the on_selection function to the <<ComboboxSelected>> event
+plaster_input.bind("<<ComboboxSelected>>", on_selection)
+update_dropdown_options()
 
 
 # validate entry boxes. validation on 'key' stroke. send each keystroke to validate function

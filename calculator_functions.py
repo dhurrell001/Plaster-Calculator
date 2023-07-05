@@ -45,13 +45,7 @@ def add_plaster():
     # commit changes to data base
     conn.commit()
 
-def update_dropdown_options(radio_choice,plaster_input,selected_plaster):
-    plaster_type = radio_choice
-    options = get_dropdownmenu_options(plaster_type)
-    plaster_input['menu'].delete(0, 'end')  # Clear the current options
 
-    for option in options:
-        plaster_input['menu'].add_command(label=option, command=lambda value=option: selected_plaster.set(value))
 
 def get_dropdownmenu_options(plaster_type):
 
@@ -80,7 +74,7 @@ def get_dropdownmenu_options(plaster_type):
         for name in names:
             # Extract the first element(plaster name) from the tuple returned from query
             options.append(name[0])
-
+    
     return options
 
 
