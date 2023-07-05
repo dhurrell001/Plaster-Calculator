@@ -16,7 +16,7 @@ class Plaster():
         self.usage = usage
 
     def material_needed(self, area, thickness):
-        return (area * self.cover) * thickness
+        return round((area * self.cover) * thickness,2)
 
 
 def add_plaster():
@@ -82,8 +82,8 @@ def calculate(plaster_name, plaster_thickness, length_input, width_input, materi
     plaster = get_material(plaster_name)
 
     if plaster:
-        area = int(length_input) * int(width_input)
-        total_needed = plaster.material_needed(area, int(plaster_thickness))
+        area = float(length_input) * float(width_input)
+        total_needed = plaster.material_needed(area, float(plaster_thickness))
         material_output.config(text=total_needed)
 
         bags_required = calculate_bags_needed(plaster, total_needed)
@@ -97,7 +97,7 @@ def calculate(plaster_name, plaster_thickness, length_input, width_input, materi
 def calculate_bags_needed(plaster_object, total_needed_in_kg):
     # calulates how many bag of plaster are needed NOTE: need to use ceiling to round up.
 
-    return total_needed_in_kg / plaster_object.bag_size
+    return round(total_needed_in_kg / plaster_object.bag_size,2)
 
 
 def get_material(material_name):
