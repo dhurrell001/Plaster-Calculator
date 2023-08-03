@@ -1,7 +1,10 @@
 
 import sqlite3
+import os
+from twilio.rest import Client
 
-conn = sqlite3.connect('plasters.db')
+conn = sqlite3.connect(
+    'C:\\Users\\dhurr\\Documents\\Python Plastering calculator Git\\Plaster-Calculator\\plasters.db')
 
 
 class Plaster():
@@ -16,7 +19,7 @@ class Plaster():
         self.usage = usage
 
     def material_needed(self, area, thickness):
-        return round((area * self.cover) * thickness,2)
+        return round((area * self.cover) * thickness, 2)
 
 
 def add_plaster():
@@ -46,7 +49,6 @@ def add_plaster():
     conn.commit()
 
 
-
 def get_dropdownmenu_options(plaster_type):
 
     # select all plaster names from database and store in a list for
@@ -74,7 +76,7 @@ def get_dropdownmenu_options(plaster_type):
         for name in names:
             # Extract the first element(plaster name) from the tuple returned from query
             options.append(name[0])
-    
+
     return options
 
 
@@ -97,7 +99,7 @@ def calculate(plaster_name, plaster_thickness, length_input, width_input, materi
 def calculate_bags_needed(plaster_object, total_needed_in_kg):
     # calulates how many bag of plaster are needed NOTE: need to use ceiling to round up.
 
-    return round(total_needed_in_kg / plaster_object.bag_size,2)
+    return round(total_needed_in_kg / plaster_object.bag_size, 2)
 
 
 def get_material(material_name):
@@ -124,3 +126,20 @@ def validate_float_input(text):
         return True
     except ValueError:
         return False
+
+
+def send_sms(plaster_type, bags):
+
+    account_sid = 'AC40c324ec7907ce2b9a4e0a7b1658de70'
+    auth_token = '8f3b7c40a22bd752a7ceaa59d05acde6'
+    client = Client(account_sid, auth_token)
+
+    message = client.messages \
+        .create(
+            body='Materal Calculator\nYou will need {} of {}'.format(
+                bags, plaster_type),
+            from_='+447380337668',
+            to='+447790437980'
+        )
+
+    print(message.sid)
