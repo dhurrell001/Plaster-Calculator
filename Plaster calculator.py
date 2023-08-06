@@ -2,6 +2,7 @@ from tkinter import *
 from calculator_functions import *
 import sqlite3
 from tkinter import ttk
+from second_frame import SecondFrame
 
 conn = sqlite3.connect(
     'C:\\Users\\dhurr\\Documents\\Python Plastering calculator Git\\Plaster-Calculator\\plasters.db')
@@ -17,10 +18,11 @@ def gather_information():
     width = width_slider.get()
 
     calculate(plaster_name, plaster_thickness, length,
-              width, material_output, bags_needed_output, plaster_description_label)
+              width, material_output, bags_needed_output, plaster_description_label, shop_list)
 
 
 def gather_sms_data():
+    # collects the data that will be put into the smas message
 
     plaster_type = selected_plaster.get()
     # Get the content of the bags_needed_output label using cget. cget gets the current valur of widget
@@ -45,6 +47,16 @@ def update_dropdown_options(*args):
 def on_selection(event):
     selected_plaster.set(plaster_input.get())
 
+# Create a function to switch to the shopping list page
+
+
+def switch_to_shopping_list_page():
+    calculator_frame.grid_forget()
+    second_frame = SecondFrame(window)  # creates second frame object
+
+    second_frame.grid(column=0, row=2, columnspan=5, padx=10, pady=10)
+    second_frame.fill_list(shop_list.create_list())
+
 
 # create a table for objects if table does not already exist
 conn.execute('''CREATE TABLE IF NOT EXISTS plasters (
@@ -67,13 +79,17 @@ window.minsize(width=300, height=300)
 window.config(padx=10, pady=10)
 window.config(background='#EEEEEE')
 
+# create frames
+calculator_frame = Frame(window)
+
+
 background_image = PhotoImage(
     file="Plaster-Calculator\plastering.png")
 # Create a canvas with the same width as the image and some height
 canvas_width = background_image.width()
 canvas_height = 140
 canvas = Canvas(window, width=canvas_width, height=canvas_height)
-canvas.grid(column=0, row=0, columnspan=5, sticky='n')
+canvas.grid(column=0, row=0, columnspan=5, sticky='n', in_=calculator_frame)
 
 # Calculate the coordinates to center the image on the canvas
 x = (canvas_width - background_image.width()) // 2
@@ -81,6 +97,11 @@ y = 0
 
 # Add the image to the canvas at the calculated coordinates
 canvas.create_image(x, y, anchor=NW, image=background_image)
+# create frames
+# calculator_frame = Frame(window)
+# second_frame = SecondFrame(window)  # creates second frame obje
+# create a shopping list object to pas to calculate function
+shop_list = shopping_list()
 
 # Create a label with the background image
 # background_label = Label(window, image=background_image)
@@ -107,26 +128,30 @@ plaster_description_label = Label(text='',
                                   background='#EEEEEE', font=('ariel', 10), wraplength=200)
 length_slider = Scale(window, from_=0, to=50,
                       orient=HORIZONTAL, length=200, resolution=0.1)
-length_slider.grid(column=1, row=3, columnspan=3, padx=10, pady=10)
+length_slider.grid(column=1, row=3, columnspan=3,
+                   padx=10, pady=10, in_=calculator_frame)
 width_slider = Scale(window, from_=0, to=50,
                      orient=HORIZONTAL, length=200, resolution=0.1)
-width_slider.grid(column=1, row=4, columnspan=3, padx=10, pady=10)
+width_slider.grid(column=1, row=4, columnspan=3,
+                  padx=10, pady=10, in_=calculator_frame)
 thickness_slider = Scale(window, from_=0, to=25,
                          orient=HORIZONTAL, length=200, resolution=0.1)
-thickness_slider.grid(column=1, row=5, columnspan=3, padx=10, pady=10)
+thickness_slider.grid(column=1, row=5, columnspan=3,
+                      padx=10, pady=10, in_=calculator_frame)
 
 
 # Place labels using Grid
 
-plaster_label.grid(column=0, row=2, padx=10, pady=10)
-length_label.grid(column=0, row=3, padx=10, pady=10)
-width_label.grid(column=0, row=4)
-thickness_label.grid(column=0, row=5)
-total_material.grid(column=0, row=7)
-material_output.grid(column=1, row=7)
-bags_needed_label.grid(column=2, row=7, padx=10, pady=10)
-bags_needed_output.grid(column=3, row=7)
-plaster_description_label.grid(column=0, row=9, columnspan=4)
+plaster_label.grid(column=0, row=2, padx=10, pady=10, in_=calculator_frame)
+length_label.grid(column=0, row=3, padx=10, pady=10, in_=calculator_frame)
+width_label.grid(column=0, row=4, in_=calculator_frame)
+thickness_label.grid(column=0, row=5, in_=calculator_frame)
+total_material.grid(column=0, row=7, in_=calculator_frame)
+material_output.grid(column=1, row=7, in_=calculator_frame)
+bags_needed_label.grid(column=2, row=7, padx=10, pady=10, in_=calculator_frame)
+bags_needed_output.grid(column=3, row=7, in_=calculator_frame)
+plaster_description_label.grid(
+    column=0, row=9, columnspan=4, in_=calculator_frame)
 
 
 # text boxes
@@ -143,8 +168,10 @@ plaster_choice_external = Radiobutton(
 
 # place radio buttons
 
-plaster_choice_internal.grid(column=0, row=1, columnspan=2)
-plaster_choice_external.grid(column=1, row=1, columnspan=2)
+plaster_choice_internal.grid(
+    column=0, row=1, columnspan=2, in_=calculator_frame)
+plaster_choice_external.grid(
+    column=1, row=1, columnspan=2, in_=calculator_frame)
 
 # Create a validation function to check if the input is a float
 validate_func = window.register(validate_float_input)
@@ -174,7 +201,8 @@ thickness_input = Entry(window, validate="key",
 
 #  input layout using grid
 
-plaster_input.grid(column=1, row=2, columnspan=3, padx=10, pady=10)
+plaster_input.grid(column=1, row=2, columnspan=3,
+                   padx=10, pady=10, in_=calculator_frame)
 # length_input.grid(column=1, row=2, padx=10, pady=10)
 # width_input.grid(column=1, row=3, padx=10, pady=10)
 # thickness_input.grid(column=1, row=4, padx=10, pady=10)
@@ -182,15 +210,27 @@ plaster_input.grid(column=1, row=2, columnspan=3, padx=10, pady=10)
 
 # button
 
-button = Button(text='CONVERT', width=20, bg='#068FFF',
+button = Button(text='CONVERT', width=15, bg='#068FFF', fg='white smoke',
                 command=gather_information)
 
 
-button.grid(column=0, row=8, columnspan=2)
+button.grid(column=0, row=8, columnspan=2,
+            padx=10, pady=10, in_=calculator_frame)
 
-sms_button = Button(text='SMS Results', width=20,
-                    bg='#068FFF', command=gather_sms_data)
-sms_button.grid(column=1, row=8, columnspan=2)
+sms_button = Button(text='SMS Results', width=15,
+                    bg='#068FFF', fg='white smoke', command=gather_sms_data)
+sms_button.grid(column=1, row=8, columnspan=2,
+                padx=10, pady=10, in_=calculator_frame)
+
+list_button = Button(text='Shopping', width=20,
+                     bg='#068FFF', fg='white smoke', command=switch_to_shopping_list_page)
+list_button.grid(column=0, row=9, columnspan=2,
+                 padx=10, pady=10, in_=calculator_frame)
+
+
+calculator_frame.grid(column=2, row=2,  padx=10, pady=10)
+
+
 window.mainloop()
 
 conn.close()

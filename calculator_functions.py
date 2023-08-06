@@ -3,6 +3,9 @@ import sqlite3
 import os
 from twilio.rest import Client
 
+twilio_auth = os.environ['TWILIO_AUTH_TOKEN']
+twilio_sid = os.environ['TWILIO_ACCOUNT_SID']
+
 conn = sqlite3.connect(
     'C:\\Users\\dhurr\\Documents\\Python Plastering calculator Git\\Plaster-Calculator\\plasters.db')
 
@@ -20,6 +23,24 @@ class Plaster():
 
     def material_needed(self, area, thickness):
         return round((area * self.cover) * thickness, 2)
+
+
+class shopping_list():
+    # create a shoping list to use in 2nd frame of app
+
+    def __init__(self) -> None:
+        self.list_item = []
+
+    def add_item(self, items):
+        self.list_item.append(items)
+
+    def create_list(self):
+
+        lst = ""
+        for item in self.list_item:
+            lst += '{} : {}\n'.format(item[0], item[1])
+           # print(f'{item[0]} : {item[1]}')
+        return lst
 
 
 def add_plaster():
@@ -80,7 +101,7 @@ def get_dropdownmenu_options(plaster_type):
     return options
 
 
-def calculate(plaster_name, plaster_thickness, length_input, width_input, material_output, bags_needed_output, plaster_description_label):
+def calculate(plaster_name, plaster_thickness, length_input, width_input, material_output, bags_needed_output, plaster_description_label, shop_list):
     plaster = get_material(plaster_name)
 
     if plaster:
@@ -91,6 +112,11 @@ def calculate(plaster_name, plaster_thickness, length_input, width_input, materi
         bags_required = calculate_bags_needed(plaster, total_needed)
         bags_needed_output.config(text=bags_required)
         plaster_description_label.config(text=plaster.description)
+
+        # shop_list = shopping_list()
+        shop_list.add_item((plaster.name, bags_required))
+        foo = shop_list.create_list()
+        print(foo)
 
     else:
         print('Plaster not found')
@@ -130,8 +156,8 @@ def validate_float_input(text):
 
 def send_sms(plaster_type, bags):
 
-    account_sid = 'AC40c324ec7907ce2b9a4e0a7b1658de70'
-    auth_token = '8f3b7c40a22bd752a7ceaa59d05acde6'
+    account_sid = os.environ.get('TWILIO_ACCOUNT_SID')
+    auth_token = os.environ.get('TWILIO_AUTH_TOKEN')
     client = Client(account_sid, auth_token)
 
     message = client.messages \
